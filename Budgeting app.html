@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budgeting App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(to right, #74ebd5, #acb6e5);
+      margin: 0;
+      padding: 20px;
+    }
+
+    .app-container {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+      margin-top: 20px;
+    }
+
+    h1, h2 {
+      color: #333333;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"], input[type="number"], input[type="date"] {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background-color: #0072ff;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #005bb5;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .expense-item, .budget-item, .bill-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #dcdcdc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      margin-top: 10px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: grey;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <h1>Budgeting App</h1>
+
+    <h2>Expense Tracking</h2>
+    <div class="form-group">
+      <input type="text" id="expense-name" placeholder="Expense Name">
+      <input type="number" id="expense-amount" placeholder="Amount">
+      <button onclick="addExpense()">Add Expense</button>
+    </div>
+    <ul id="expense-list"></ul>
+
+    <h2>Budget Creation</h2>
+    <div class="form-group">
+      <input type="text" id="budget-name" placeholder="Budget Name">
+      <input type="number" id="budget-amount" placeholder="Amount">
+      <button onclick="addBudget()">Add Budget</button>
+    </div>
+    <ul id="budget-list"></ul>
+
+    <h2>Financial Reports</h2>
+    <div class="form-group">
+      <button onclick="generateReport()">Generate Report</button>
+    </div>
+    <div id="report"></div>
+
+    <h2>Bill Reminders</h2>
+    <div class="form-group">
+      <input type="text" id="bill-name" placeholder="Bill Name">
+      <input type="number" id="bill-amount" placeholder="Amount">
+      <input type="date" id="bill-date">
+      <button onclick="addBill()">Add Bill</button>
+    </div>
+    <ul id="bill-list"></ul>
+  </div>
+
+  <script>
+    let expenses = [];
+    let budgets = [];
+    let bills = [];
+
+    const expenseList = document.getElementById('expense-list');
+    const budgetList = document.getElementById('budget-list');
+    const billList = document.getElementById('bill-list');
+    const report = document.getElementById('report');
+
+    function addExpense() {
+      const name = document.getElementById('expense-name').value.trim();
+      const amount = parseFloat(document.getElementById('expense-amount').value.trim());
+
+      if (name && amount) {
+        const expense = { name, amount };
+        expenses.push(expense);
+        displayExpenses();
+        document.getElementById('expense-name').value = '';
+        document.getElementById('expense-amount').value = '';
+      }
+    }
+
+    function displayExpenses() {
+      expenseList.innerHTML = '';
+      expenses.forEach(expense => {
+        const li = document.createElement('li');
+        li.className = 'expense-item';
+        li.textContent = `${expense.name}: $${expense.amount.toFixed(2)}`;
+        expenseList.appendChild(li);
+      });
+    }
+
+    function addBudget() {
+      const name = document.getElementById('budget-name').value.trim();
+      const amount = parseFloat(document.getElementById('budget-amount').value.trim());
+
+      if (name && amount) {
+        const budget = { name, amount };
+        budgets.push(budget);
+        displayBudgets();
+        document.getElementById('budget-name').value = '';
+        document.getElementById('budget-amount').value = '';
+      }
+    }
+
+    function displayBudgets() {
+      budgetList.innerHTML = '';
+      budgets.forEach(budget => {
+        const li = document.createElement('li');
+        li.className = 'budget-item';
+        li.textContent = `${budget.name}: $${budget.amount.toFixed(2)}`;
+        budgetList.appendChild(li);
+      });
+    }
+
+    function generateReport() {
+      const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
+      const totalBudgets = budgets.reduce((total, budget) => total + budget.amount, 0);
+
+      report.innerHTML = `
+        <p>Total Expenses: $${totalExpenses.toFixed(2)}</p>
+        <p>Total Budgets: $${totalBudgets.toFixed(2)}</p>
+        <p>Balance: $${(totalBudgets - totalExpenses).toFixed(2)}</p>
+      `;
+    }
+
+    function addBill() {
+      const name = document.getElementById('bill-name').value.trim();
+      const amount = parseFloat(document.getElementById('bill-amount').value.trim());
+      const date = document.getElementById('bill-date').value;
+
+      if (name && amount && date) {
+        const bill = { name, amount, date };
+        bills.push(bill);
+        displayBills();
+        document.getElementById('bill-name').value = '';
+        document.getElementById('bill-amount').value = '';
+        document.getElementById('bill-date').value = '';
+      }
+    }
+
+    function displayBills() {
+      billList.innerHTML = '';
+      bills.forEach(bill => {
+        const li = document.createElement('li');
+        li.className = 'bill-item';
+        li.textContent = `${bill.name}: $${bill.amount.toFixed(2)} - Due: ${bill.date}`;
+        billList.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
